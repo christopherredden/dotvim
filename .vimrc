@@ -21,6 +21,7 @@ imap <3-MiddleMouse> <Nop>
 map <4-MiddleMouse> <Nop>
 imap <4-MiddleMouse> <Nop>
 map <S-F3> :call ClearAllButMatches() <Return>
+nmap <F8> :TagbarToggle<CR>
 
 " Search for word under cursor
 "map <F4> :execute "vimgrep /" . expand("<cword>") . "/j **" <Bar> cw<CR>
@@ -46,6 +47,8 @@ Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
 Bundle 'https://github.com/mileszs/ack.vim'
 Bundle 'https://github.com/altercation/vim-colors-solarized'
 Bundle 'https://github.com/dbakker/vim-projectroot'
+Bundle 'https://github.com/majutsushi/tagbar'
+"Bundle 'YouCompleteMe'
 
 " Color and Font Setup
 if has('gui_running')
@@ -152,6 +155,7 @@ let g:ackprg = 'ag --nogroup --nocolor --column'
 
 "Auto change to project root
 au BufEnter * if &ft != 'help' | call ProjectRootCD() | endif
+au BufRead,BufNewFile *.lua.txt set syntax=lua
 
 "" Remove all text except what matches the current search result
 "" The opposite of :%s///g (which clears all instances of the current search).

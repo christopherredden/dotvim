@@ -3,14 +3,14 @@ files=".vimrc"
 folders="bundle colors"
 
 echo "Installing .vimrc..."
-mkdir -p ~/.vim
-
 for file in $files; do
     ln -s $dir/$file ~/$file
 done
 
+echo "Installing .vim files..."
+mkdir -p ~/.vim
 for folder in $folders; do
-    ln -s $dir/$folder/ ~/.vim/$folder
+    ln -d $dir/.vim/$folder ~/.vim/$folder
 done
 
 echo "done."
