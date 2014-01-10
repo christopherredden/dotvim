@@ -22,6 +22,12 @@ map <4-MiddleMouse> <Nop>
 imap <4-MiddleMouse> <Nop>
 map <S-F3> :call ClearAllButMatches() <Return>
 
+" Search for word under cursor
+"map <F4> :execute "vimgrep /" . expand("<cword>") . "/j **" <Bar> cw<CR>
+"map <F4> :call Search(expand("<,>")) <Return>
+vmap <F4> :call Search(GetSelectionText()) <Return>
+nmap <F4> :call Search(SearchText()) <Return>
+
 " Vundle Required
 set nocompatible
 filetype off
@@ -39,6 +45,7 @@ Bundle 'https://github.com/kien/ctrlp.vim.git'
 Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
 Bundle 'https://github.com/mileszs/ack.vim'
 Bundle 'https://github.com/altercation/vim-colors-solarized'
+Bundle 'https://github.com/dbakker/vim-projectroot'
 
 " Color and Font Setup
 if has('gui_running')
@@ -140,6 +147,12 @@ if has("multi_byte")
     set fileencodings=ucs-bom,utf-8,latin1
 endif
 
+"ack.vim
+let g:ackprg = 'ag --nogroup --nocolor --column'
+
+"Auto change to project root
+au BufEnter * if &ft != 'help' | call ProjectRootCD() | endif
+
 "" Remove all text except what matches the current search result
 "" The opposite of :%s///g (which clears all instances of the current search).
 function! ClearAllButMatches()
@@ -150,4 +163,39 @@ function! ClearAllButMatches()
     put x
     0d _
     let @x = old
+endfunction
+
+function! Search(target, ...)
+    let target = a:target
+
+    if(empty(target)) | return | endif
+
+    if a:0 > 0
+        let path = a:1
+    else
+        let path = ProjectRootGuess()
+    end
+
+    echo "Searching for: " . path
+    ":execute "vimgrep /" . target . "/j " . path . "/**" | cw<Return>
+    :execute "Ack " . target . " " . path
+
+endfunction
+
+function! GetSelectionText()
+    let old_a = @a
+    normal! gv"ay
+    let selection = @a
+    let @a = old_a
+
+    return selection
+endfunction
+
+function! SearchText()
+    "let curline = getline('.')
+    call inputsave()
+    let text = input('Search All: ')
+    call inputrestore()
+    "call setline('.', curline)
+    return text
 endfunction
