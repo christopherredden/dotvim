@@ -58,13 +58,15 @@ if has('gui_running')
   "colorscheme dusk
   "colorscheme molokai
   "let g:molokai_original = 1
+  "set background=light
+  "colorscheme summerfruit256
   
   colorscheme solarized
-  set background=light
-  "set background=dark
-  let g:solarized_termcolors=256
+  "set background=light
+  set background=dark
+  "let g:solarized_termcolors=256
   
-  set guifont=bitstream\ vera\ sans\ mono:h10
+  set guifont=dejavu\ sans\ mono:h10
   set antialias
 else
   set t_Co=256
@@ -73,14 +75,16 @@ else
   "colorscheme dusk
   "colorscheme molokai
   "let g:molokai_original = 1
+  "set background=light
+  "colorscheme summerfruit256
 
   colorscheme solarized
-  set background=light
-  "set background=dark
+  "set background=light
+  set background=dark
   let g:solarized_termcolors=256
 
+  set guifont=dejavu\ sans\ mono:h10
   set antialias
-  set guifont=bitstream\ vera\ sans\ mono:h10
 endif
 
 " Smart Formatting
