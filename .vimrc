@@ -48,7 +48,10 @@ Bundle 'https://github.com/mileszs/ack.vim'
 Bundle 'https://github.com/altercation/vim-colors-solarized'
 Bundle 'https://github.com/dbakker/vim-projectroot'
 Bundle 'https://github.com/majutsushi/tagbar'
-"Bundle 'YouCompleteMe'
+Bundle 'https://github.com/nosami/Omnisharp'
+Bundle 'https://github.com/tpope/vim-dispatch'
+Bundle 'https://github.com/ervandew/supertab'
+Bundle 'https://github.com/scrooloose/syntastic'
 
 " Color and Font Setup
 if has('gui_running')
@@ -156,6 +159,22 @@ endif
 
 "ack.vim
 let g:ackprg = 'ag --nogroup --nocolor --column'
+
+"Omnisharp
+autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+set completeopt=longest,menuone,preview
+"set hidden
+let g:OmniSharp_typeLookupInPreview = 1
+"autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+"set updatetime=500
+"set cmdheight=2
+"let g:OmniSharp_autoselect_existing_sln = 0
+
+"Supertab
+let g:SuperTabDefaultCompletionType = 'context'
+let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+let g:SuperTabDefaultCompletionTypeDiscovery = ["&omnifunc:<c-x><c-o>","&completefunc:<c-x><c-n>"]
+"let g:SuperTabClosePreviewOnPopupClose = 1
 
 "Auto change to project root
 au BufEnter * if &ft != 'help' | call ProjectRootCD() | endif
