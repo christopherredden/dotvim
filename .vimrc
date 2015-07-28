@@ -11,7 +11,8 @@ endif
 let mapleader = ","
 
 " Bindings
-map <C-MiddleMouse> "+p
+"map <C-MiddleMouse> "*p
+vmap <C-MiddleMouse> "*y
 imap <C-MiddleMouse> <C-R>+
 noremap <MiddleMouse> <LeftMouse>
 map <2-MiddleMouse> <Nop>
@@ -69,7 +70,8 @@ if has('gui_running')
   set background=dark
   "let g:solarized_termcolors=256
   
-  set guifont=dejavu\ sans\ mono:h10
+  "set guifont=dejavu\ sans\ mono:h10
+  set guifont=bitstream\ vera\ sans\ mono:h10
   set antialias
 else
   set t_Co=256
@@ -86,7 +88,8 @@ else
   set background=dark
   let g:solarized_termcolors=256
 
-  set guifont=dejavu\ sans\ mono:h10
+  "set guifont=dejavu\ sans\ mono:h10
+  set guifont=bitstream\ vera\ sans\ mono:h10
   set antialias
 endif
 
@@ -164,11 +167,24 @@ let g:ackprg = 'ag --nogroup --nocolor --column'
 autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
 set completeopt=longest,menuone,preview
 "set hidden
-let g:OmniSharp_typeLookupInPreview = 1
-"autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-"set updatetime=500
-"set cmdheight=2
+autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+set updatetime=500
+set cmdheight=2
 "let g:OmniSharp_autoselect_existing_sln = 0
+
+" Keys
+" Add syntax highlighting for types and interfaces
+nnoremap <leader>th :OmniSharpHighlightTypes<cr>
+autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
+nnoremap <leader>fi :OmniSharpFindImplementations<cr>
+nnoremap <leader>ft :OmniSharpFindType<cr>
+nnoremap <leader>fs :OmniSharpFindSymbol<cr>
+nnoremap <leader>fu :OmniSharpFindUsages<cr>
+nnoremap <leader>fm :OmniSharpFindMembersInBuffer<cr>
+" cursor can be anywhere on the line containing an issue for this one
+nnoremap <leader>x  :OmniSharpFixIssue<cr>
+nnoremap <leader>tt :OmniSharpTypeLookup<cr>
+nnoremap <leader>dc :OmniSharpDocumentation<cr>
 
 "Supertab
 let g:SuperTabDefaultCompletionType = 'context'
