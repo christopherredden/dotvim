@@ -27,7 +27,7 @@ ECHO UAC.ShellExecute "!batchPath!", "ELEV", "", "runas", 1 >> "%temp%\OEgetPriv
 "%temp%\OEgetPrivileges.vbs" 
 exit /B 
 
-:gotPrivileges 
+:gotPrivileges
 ::::::::::::::::::::::::::::
 :START
 ::::::::::::::::::::::::::::
@@ -35,15 +35,19 @@ setlocal & pushd .
 
 REM Run shell as admin (example) - put here code as you like
 
+echo Creating VIMDIR
 SET dir=%~dp0
 set vimdir=%UserProfile%\.vim\
 
-mkdir %vimdir% 2>NUL
+mkdir "%vimdir%"
 
-mklink %UserProfile%\.vimrc %dir%\.vimrc 2>NUL
+echo Linking VIMRC
+mklink "%UserProfile%\.vimrc" "%dir%\.vimrc"
 
+echo Linking Modules
 for /d %%i in (%dir%.vim\*) do (
-    mklink /D %vimdir%%%~ni %%i
+    echo mklink /D %vimdir%%%~ni %%i
 )
 
+echo Complete!
 pause
