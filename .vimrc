@@ -5,7 +5,7 @@ if has('win32') || has('win64')
     " Make windows use ~/.vim too, I don't want to use _vimfiles
     set runtimepath^=~/.vim
 else
-    set runtimepath+=~/.vim/bundle/vundle/
+    set runtimepath+=~/.vim/bundle/Vundle.vim/
 endif
 
 let mapleader = ","
@@ -34,25 +34,30 @@ nmap <F4> :call Search(SearchText()) <Return>
 set nocompatible
 filetype off
 
-set rtp+=~/.vim/bundle/vundle/
-set rtp+=$GOROOT/misc/vim
-call vundle#rc()
+call vundle#begin()
 
-Bundle 'gmarik/vundle'
+Plugin 'VundleVim/Vundle.vim'
 
-" Bundles
-" Bundle 'git://github.com/Rip-Rip/clang_complete.git'
-Bundle 'c.vim'
-Bundle 'https://github.com/kien/ctrlp.vim.git'
-Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
-Bundle 'https://github.com/mileszs/ack.vim'
-Bundle 'https://github.com/altercation/vim-colors-solarized'
-Bundle 'https://github.com/dbakker/vim-projectroot'
-Bundle 'https://github.com/majutsushi/tagbar'
-Bundle 'https://github.com/nosami/Omnisharp'
-Bundle 'https://github.com/tpope/vim-dispatch'
-Bundle 'https://github.com/ervandew/supertab'
-Bundle 'https://github.com/scrooloose/syntastic'
+" Plugins
+Plugin 'c.vim'
+Plugin 'https://github.com/kien/ctrlp.vim.git'
+Plugin 'https://github.com/mileszs/ack.vim'
+Plugin 'https://github.com/altercation/vim-colors-solarized'
+Plugin 'https://github.com/dbakker/vim-projectroot'
+Plugin 'https://github.com/majutsushi/tagbar'
+Plugin 'https://github.com/OmniSharp/omnisharp-vim'
+Plugin 'https://github.com/tpope/vim-dispatch'
+Plugin 'https://github.com/ervandew/supertab'
+Plugin 'https://github.com/scrooloose/syntastic'
+Plugin 'https://github.com/ervandew/supertab'
+Plugin 'https://github.com/godlygeek/tabular'
+Plugin 'https://github.com/vim-airline/vim-airline'
+Plugin 'https://github.com/vim-airline/vim-airline-themes'
+Plugin 'https://github.com/majutsushi/tagbar'
+Plugin 'https://github.com/easymotion/vim-easymotion'
+
+call vundle#end()
+filetype plugin indent on
 
 " Color and Font Setup
 if has('gui_running')
@@ -71,7 +76,8 @@ if has('gui_running')
   "let g:solarized_termcolors=256
   
   "set guifont=dejavu\ sans\ mono:h10
-  set guifont=bitstream\ vera\ sans\ mono:h10
+  "set guifont=bitstream\ vera\ sans\ mono:h10
+  set guifont=consolas:h12
   set antialias
 else
   set t_Co=256
@@ -94,13 +100,11 @@ else
 endif
 
 " Smart Formatting
-filetype plugin on
 set smartindent
 set tabstop=4
 set expandtab
 set shiftwidth=4
 set backspace=2 " make backspace work like most other apps
-filetype indent on
 set number
 "set autochdir
 syntax enable
@@ -141,10 +145,13 @@ let g:clang_use_library = 1
 map <C-c> :call g:ClangUpdateQuickFix()<CR>
 
 " CtrlP
-let g:ctrlp_by_filename = 1
+"let g:ctrlp_by_filename = 1
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip  " MacOSX/Linux
 set wildignore+=tmp\*,*.swp,*.zip,*.exe,*.lib   " Windows
-set wildignore+=*/gamedata/* " Valkyrie
+let g:ctrlp_working_path_mode = 'r'
+let g:ctrlp_root_markers = ['.projectroot']
+let g:ctrlp_custom_ignore = '\v\.(unity|prefab|meta|dll|so|exe|lib|zip|png|dds|fbx|dae)$'
+"set wildignore+=*/gamedata/* " Valkyrie
 
 if has('win32') || has('win64')
 	"let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d | findstr .*\.lua$' "Lua
@@ -164,9 +171,11 @@ endif
 let g:ackprg = 'ag --nogroup --nocolor --column'
 
 "Omnisharp
+let g:OmniSharp_selector_ui = 'ctrlp'
 autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
 set completeopt=longest,menuone,preview
-"set hidden
+set splitbelow
+set hidden
 autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 set updatetime=500
 set cmdheight=2
@@ -191,6 +200,11 @@ let g:SuperTabDefaultCompletionType = 'context'
 let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 let g:SuperTabDefaultCompletionTypeDiscovery = ["&omnifunc:<c-x><c-o>","&completefunc:<c-x><c-n>"]
 "let g:SuperTabClosePreviewOnPopupClose = 1
+
+"Airline
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_theme='solarized'
+let g:airline_powerline_fonts = 1
 
 "Auto change to project root
 au BufEnter * if &ft != 'help' | call ProjectRootCD() | endif
