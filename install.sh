@@ -1,16 +1,15 @@
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 files=".vimrc"
-folders="bundle colors"
 
 echo "Installing .vimrc..."
 for file in $files; do
     ln -s $dir/$file ~/$file
 done
 
-echo "Installing .vim files..."
-mkdir -p ~/.vim
-for folder in $folders; do
-    ln -d $dir/.vim/$folder ~/.vim/$folder
-done
+echo "Cloning Vundle..."
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+echo "Installing Plugins..."
+vim +PluginInstall +qall
 
 echo "done."
