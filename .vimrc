@@ -24,12 +24,6 @@ imap <4-MiddleMouse> <Nop>
 map <S-F3> :call ClearAllButMatches() <Return>
 nmap <F8> :TagbarToggle<CR>
 
-" Search for word under cursor
-"map <F4> :execute "vimgrep /" . expand("<cword>") . "/j **" <Bar> cw<CR>
-"map <F4> :call Search(expand("<,>")) <Return>
-vmap <F4> :call Search(GetSelectionText()) <Return>
-nmap <F4> :call Search(SearchText()) <Return>
-
 " Vundle Required
 set nocompatible
 filetype off
@@ -44,13 +38,7 @@ Plugin 'https://github.com/kien/ctrlp.vim.git'
 Plugin 'https://github.com/mileszs/ack.vim'
 Plugin 'https://github.com/altercation/vim-colors-solarized'
 Plugin 'https://github.com/dbakker/vim-projectroot'
-Plugin 'https://github.com/majutsushi/tagbar'
-Plugin 'https://github.com/OmniSharp/omnisharp-vim'
-Plugin 'https://github.com/tpope/vim-dispatch'
 Plugin 'https://github.com/ervandew/supertab'
-Plugin 'https://github.com/scrooloose/syntastic'
-Plugin 'https://github.com/ervandew/supertab'
-Plugin 'https://github.com/godlygeek/tabular'
 Plugin 'https://github.com/vim-airline/vim-airline'
 Plugin 'https://github.com/vim-airline/vim-airline-themes'
 Plugin 'https://github.com/majutsushi/tagbar'
@@ -62,39 +50,15 @@ filetype plugin indent on
 " Color and Font Setup
 if has('gui_running')
   set guioptions-=T  " no toolbar
-  "colorscheme navajo-night
-  "colorscheme autumn
-  "colorscheme dusk
-  "colorscheme molokai
-  "let g:molokai_original = 1
-  "set background=light
-  "colorscheme summerfruit256
-  
   colorscheme solarized
-  "set background=light
   set background=dark
-  "let g:solarized_termcolors=256
-  
-  "set guifont=dejavu\ sans\ mono:h10
-  "set guifont=bitstream\ vera\ sans\ mono:h10
   set guifont=consolas:h12
   set antialias
 else
   set t_Co=256
-  "colorscheme navajo-night
-  "colorscheme autumn
-  "colorscheme dusk
-  "colorscheme molokai
-  "let g:molokai_original = 1
-  "set background=light
-  "colorscheme summerfruit256
-
   colorscheme solarized
-  "set background=light
   set background=dark
   let g:solarized_termcolors=256
-
-  "set guifont=dejavu\ sans\ mono:h10
   set guifont=bitstream\ vera\ sans\ mono:h10
   set antialias
 endif
@@ -106,7 +70,7 @@ set expandtab
 set shiftwidth=4
 set backspace=2 " make backspace work like most other apps
 set number
-"set autochdir
+
 syntax enable
 
 " Status Bar
@@ -136,14 +100,6 @@ set foldmethod=syntax
 " Disable writing to default register on p
 xnoremap p pgvy
 
-" clang
-" highlight the warnings and errors
-let g:clang_hl_errors = 1
-" open quickfix window on error
-let g:clang_complete_copen = 1
-let g:clang_use_library = 1
-map <C-c> :call g:ClangUpdateQuickFix()<CR>
-
 " CtrlP
 "let g:ctrlp_by_filename = 1
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip  " MacOSX/Linux
@@ -151,7 +107,6 @@ set wildignore+=tmp\*,*.swp,*.zip,*.exe,*.lib   " Windows
 let g:ctrlp_working_path_mode = 'r'
 let g:ctrlp_root_markers = ['.projectroot']
 let g:ctrlp_custom_ignore = '\v\.(unity|prefab|meta|dll|so|exe|lib|zip|png|dds|fbx|dae)$'
-"set wildignore+=*/gamedata/* " Valkyrie
 
 if has('win32') || has('win64')
 	"let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d | findstr .*\.lua$' "Lua
@@ -169,17 +124,6 @@ endif
 
 "ack.vim
 let g:ackprg = 'ag --nogroup --nocolor --column'
-
-"Omnisharp
-let g:OmniSharp_selector_ui = 'ctrlp'
-autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-set completeopt=longest,menuone,preview
-set splitbelow
-set hidden
-autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-set updatetime=500
-set cmdheight=2
-"let g:OmniSharp_autoselect_existing_sln = 0
 
 " Keys
 " Add syntax highlighting for types and interfaces
@@ -199,7 +143,6 @@ nnoremap <leader>dc :OmniSharpDocumentation<cr>
 let g:SuperTabDefaultCompletionType = 'context'
 let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 let g:SuperTabDefaultCompletionTypeDiscovery = ["&omnifunc:<c-x><c-o>","&completefunc:<c-x><c-n>"]
-"let g:SuperTabClosePreviewOnPopupClose = 1
 
 "Airline
 let g:airline#extensions#tabline#enabled = 1
@@ -209,50 +152,3 @@ let g:airline_powerline_fonts = 1
 "Auto change to project root
 au BufEnter * if &ft != 'help' | call ProjectRootCD() | endif
 au BufRead,BufNewFile *.lua.txt set syntax=lua
-
-"" Remove all text except what matches the current search result
-"" The opposite of :%s///g (which clears all instances of the current search).
-function! ClearAllButMatches()
-    let old = @x
-    let @x=""
-    %s//\=setreg('X', submatch(0), 'l')/g
-    %d _
-    put x
-    0d _
-    let @x = old
-endfunction
-
-function! Search(target, ...)
-    let target = a:target
-
-    if(empty(target)) | return | endif
-
-    if a:0 > 0
-        let path = a:1
-    else
-        let path = ProjectRootGuess()
-    end
-
-    echo "Searching for: " . path
-    ":execute "vimgrep /" . target . "/j " . path . "/**" | cw<Return>
-    :execute "Ack " . target . " " . path
-
-endfunction
-
-function! GetSelectionText()
-    let old_a = @a
-    normal! gv"ay
-    let selection = @a
-    let @a = old_a
-
-    return selection
-endfunction
-
-function! SearchText()
-    "let curline = getline('.')
-    call inputsave()
-    let text = input('Search All: ')
-    call inputrestore()
-    "call setline('.', curline)
-    return text
-endfunction
