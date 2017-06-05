@@ -1,13 +1,5 @@
 set ff=unix
 
-" Windows path fix
-if has('win32') || has('win64')
-    " Make windows use ~/.vim too, I don't want to use _vimfiles
-    set runtimepath^=~/.vim
-else
-    set runtimepath+=~/.vim/bundle/Vundle.vim/
-endif
-
 let mapleader = ","
 
 " Bindings
@@ -28,7 +20,12 @@ nmap <F8> :TagbarToggle<CR>
 set nocompatible
 filetype off
 
-call vundle#begin()
+if has('nvim')
+    set rtp+=~/.config/nvim/bundle/Vundle.vim
+    call vundle#begin("~/.config/nvim/bundle")
+else
+    call vundle#begin()
+endif
 
 Plugin 'VundleVim/Vundle.vim'
 
@@ -53,14 +50,12 @@ if has('gui_running')
   colorscheme solarized
   set background=dark
   set guifont=consolas:h12
-  set antialias
 else
   set t_Co=256
   colorscheme solarized
   set background=dark
   let g:solarized_termcolors=256
   set guifont=bitstream\ vera\ sans\ mono:h10
-  set antialias
 endif
 
 " Smart Formatting
