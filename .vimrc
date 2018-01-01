@@ -77,7 +77,10 @@ if has('gui_running')
   
   "set guifont=dejavu\ sans\ mono:h10
   "set guifont=bitstream\ vera\ sans\ mono:h10
-  set guifont=consolas:h12
+  "set guifont=consolas:h12
+  set guifont=droid\ sans\ mono:h12
+  set guifontwide=hiragino\ sans\ mono:h12
+  set guifontset
   set antialias
 else
   set t_Co=256

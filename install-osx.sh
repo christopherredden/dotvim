@@ -10,7 +10,7 @@ done
 echo "Installing .vim files..."
 mkdir -p ~/.vim
 for folder in $folders; do
-    gln -d $dir/.vim/$folder ~/.vim/$folder
+    echo ln -d $dir/.vim/$folder ~/.vim/$folder
 done
 
 echo "done."
