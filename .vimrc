@@ -164,7 +164,6 @@ let g:SuperTabDefaultCompletionTypeDiscovery = ["&omnifunc:<c-x><c-o>","&complet
 "Airline
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_theme='solarized'
-let g:airline_powerline_fonts = 1
 
 "Auto change to project root
 au BufEnter * if &ft != 'help' | call ProjectRootCD() | endif
