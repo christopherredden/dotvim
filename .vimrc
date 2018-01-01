@@ -40,12 +40,26 @@ Plugin 'https://github.com/vim-airline/vim-airline'
 Plugin 'https://github.com/vim-airline/vim-airline-themes'
 Plugin 'https://github.com/majutsushi/tagbar'
 Plugin 'https://github.com/easymotion/vim-easymotion'
+Plugin 'https://github.com/icymind/NeoSolarized'
 
 call vundle#end()
 filetype plugin indent on
 
 " Color and Font Setup
-if has('gui_running')
+if has('gui_vimr')
+  set guioptions-=T  " no toolbar
+  colorscheme NeoSolarized
+  set background=dark
+  "let g:solarized_termcolors=256
+  
+  "set guifont=dejavu\ sans\ mono:h10
+  "set guifont=bitstream\ vera\ sans\ mono:h10
+  "set guifont=consolas:h12
+  "set guifont=droid\ sans\ mono:h12
+  "set guifontwide=hiragino\ sans\ mono:h12
+  "set guifontset
+  "set antialias
+elseif has('gui_running')
   set guioptions-=T  " no toolbar
   colorscheme solarized
   set background=dark
