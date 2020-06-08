@@ -2,6 +2,12 @@ set ff=unix
 
 let mapleader = "\<Space>"
 
+" Copy+Paste Support
+if has('win32')
+    set mouse=a
+    source $VIMRUNTIME/mswin.vim
+endif
+
 " Modify Middle Mouse
 "map <C-MiddleMouse> "*p
 vmap <C-MiddleMouse> "*y
@@ -13,53 +19,54 @@ map <3-MiddleMouse> <Nop>
 imap <3-MiddleMouse> <Nop>
 map <4-MiddleMouse> <Nop>
 imap <4-MiddleMouse> <Nop>
-nmap <F8> :TagbarToggle<CR>
-
-" Vundle Required
-set nocompatible
-filetype off
-
-if has('nvim')
-    set rtp+=~/.config/nvim/bundle/Vundle.vim
-    call vundle#begin("~/.config/nvim/bundle")
-else
-    call vundle#begin()
-endif
-
-" FZF
-set rtp+=/usr/local/opt/fzf
-
-Plugin 'VundleVim/Vundle.vim'
 
 " Plugins
-Plugin 'https://github.com/kien/ctrlp.vim.git'
-Plugin 'https://github.com/mileszs/ack.vim'
-Plugin 'https://github.com/dbakker/vim-projectroot'
-Plugin 'https://github.com/vim-airline/vim-airline'
-Plugin 'https://github.com/vim-airline/vim-airline-themes'
-Plugin 'https://github.com/rcabralc/monokai-airline.vim'
-Plugin 'https://github.com/easymotion/vim-easymotion'
-Plugin 'https://github.com/xolox/vim-misc'
+if has('nvim')
+    call plug#begin(stdpath('data') . '/plugged')
+else
+    call plug#begin('~/.vim/plugged')
+endif
 
-Plugin 'https://github.com/icymind/NeoSolarized'
-Plugin 'https://github.com/crusoexia/vim-monokai'
-Plugin 'https://github.com/altercation/vim-colors-solarized'
+Plug 'https://github.com/easymotion/vim-easymotion'
+Plug 'https://github.com/majutsushi/tagbar'
+Plug 'https://github.com/scrooloose/nerdtree'
+Plug 'https://github.com/junegunn/fzf'
+Plug 'https://github.com/junegunn/fzf.vim'
 
-Plugin 'https://github.com/majutsushi/tagbar'
-Plugin 'https://github.com/scrooloose/nerdtree'
+Plug 'https://github.com/vim-airline/vim-airline'
+Plug 'https://github.com/vim-airline/vim-airline-themes'
+Plug 'https://github.com/rcabralc/monokai-airline.vim'
 
-Plugin 'https://github.com/ayu-theme/ayu-vim'
-Plugin 'https://github.com/drewtempelmeyer/palenight.vim'
+Plug 'https://github.com/icymind/NeoSolarized'
+Plug 'https://github.com/crusoexia/vim-monokai'
+Plug 'https://github.com/altercation/vim-colors-solarized'
+Plug 'https://github.com/ayu-theme/ayu-vim'
+Plug 'https://github.com/drewtempelmeyer/palenight.vim'
+call plug#end()
 
-Plugin 'https://github.com/junegunn/fzf.vim'
-
-call vundle#end()
 filetype plugin indent on
 
+""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-easymotion
+""""""""""""""""""""""""""""""""""""""""""""""""
+" <Leader>f{char} to move to {char}
+map  <Leader>f <Plug>(easymotion-bd-f)
+nmap <Leader>f <Plug>(easymotion-overwin-f)
+" s{char}{char} to move to {char}{char}
+nmap s <Plug>(easymotion-overwin-f2)
+" Move to line
+map <Leader>L <Plug>(easymotion-bd-jk)
+nmap <Leader>L <Plug>(easymotion-overwin-line)
+" Move to word
+map  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
+""""""""""""""""""""""""""""""""""""""""""""""""
+
 " Color and Font Setup
-set t_Co=256
 colorscheme palenight
 set termguicolors     " enable true colors support
+set background=dark
+"colorscheme one
 set guifont="Noto Mono:h10"
 
 " Smart Formatting
@@ -98,15 +105,6 @@ set foldmethod=syntax
 " Disable writing to default register on p
 xnoremap p pgvy
 
-" CtrlP
-"let g:ctrlp_by_filename = 1
-set wildignore+=*/tmp/*,*.so,*.swp,*.zip  " MacOSX/Linux
-set wildignore+=tmp\*,*.swp,*.zip,*.exe,*.lib   " Windows
-let g:ctrlp_working_path_mode = 'r'
-if executable('ag')
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-endif
-
 if has("multi_byte")
     if &termencoding == ""
         let &termencoding = &encoding
@@ -116,20 +114,77 @@ if has("multi_byte")
     set fileencodings=ucs-bom,utf-8,latin1
 endif
 
-" LeaderF to use CtrlP
-let g:Lf_ShortcutF = '<C-P>'
-nmap <C-O> :LeaderfBuffer<CR><Tab>
+"""""""""""""""""""""""""""""""""""""""""""""""""
+" FZF
+"""""""""""""""""""""""""""""""""""""""""""""""""
+" Reverse the layout to make the FZF list top-down
+let $FZF_DEFAULT_OPTS='--color=dark --layout=reverse --margin 1,4'
 
-" FZF Keys
+" Using the custom window creation function
+let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+
+" Customize fzf colors to match your color scheme
+" 'info':    ['fg', 'PreProc'],
+" 'prompt':  ['fg', 'Conditional'],
+" \ 'header':  ['fg', 'Comment'] }
+" \ 'bg':      ['bg', 'Normal'],
+let g:fzf_colors =
+	\ { 'fg':      ['fg', 'Normal'],
+	\ 'bg':      ['bg', -1],
+	\ 'hl':      ['fg', 'Comment'],
+	\ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+	\ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+	\ 'hl+':     ['fg', 'Statement'],
+	\ 'info':    ['fg', 0],
+	\ 'border':  ['fg', 'Ignore'],
+	\ 'prompt':  ['fg', 0],
+	\ 'pointer': ['fg', 'Exception'],
+	\ 'marker':  ['fg', 'Keyword'],
+	\ 'spinner': ['fg', 'Label'],
+	\ 'header':  ['fg', -1] }
+
+" Function to create the custom floating window
+function! FloatingFZF()
+    " creates a scratch, unlisted, new, empty, unnamed buffer
+    " to be used in the floating window
+    let buf = nvim_create_buf(v:false, v:true)
+    call setbufvar(buf, '&signcolumn', 'no')
+    " 90% of the height
+    let height = float2nr(&lines * 0.9)
+    " 60% of the width
+    let width = float2nr(&columns * 0.8)
+    " horizontal position (centralized)
+    let horizontal = float2nr((&columns - width) / 2)
+    " vertical position (one line down of the top)
+    let vertical = 1
+    let opts = {
+        \ 'relative': 'editor',
+        \ 'row': vertical,
+        \ 'col': horizontal,
+        \ 'width': width,
+        \ 'height': height,
+        \ 'style': 'minimal'
+        \ }
+    " open the new window, floating, and enter to it
+    call nvim_open_win(buf, v:true, opts)
+endfunction
+
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
 nnoremap <Leader>a :Ag<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>g :GFiles<CR>
 nnoremap <Leader>f :Lines<CR>
 
-"ack.vim
-"let g:ackprg = 'ag --vimgrep --path-to-ignore .hg/.hgignore.local'
-"cnoreabbrev Ack Ack!
-"nnoremap <Leader>a :Ack!<Space>
+command! -bang -nargs=? GFiles call fzf#vim#gitfiles(<q-args>)
+command! -bang -nargs=* Ag                        call fzf#vim#ag(<q-args>)
+command! -bang -nargs=* Rg                        call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -- ".shellescape(<q-args>), 1)
+command! -bang -nargs=* Rgu                       call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -g !Tests/* -g !Documentation/* -- ".shellescape(<q-args>), 1)
+command! -bar -bang -nargs=? -complete=buffer Buffers  call fzf#vim#buffers(<q-args>)
+nnoremap <silent> <Leader>f :call fzf#vim#files('', fzf#vim#with_preview({'options': '--prompt ""'}, 'right:70%')) <CR>
 
 "Airline
 let g:airline#extensions#tabline#enabled = 1
@@ -137,4 +192,4 @@ let g:airline_theme='monokai'
 "let g:airline_powerline_fonts=1
 
 " Tags settings
-set tags=.tags;
+"set tags=.tags;
