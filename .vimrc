@@ -182,7 +182,7 @@ nnoremap <Leader>f :Lines<CR>
 command! -bang -nargs=? GFiles call fzf#vim#gitfiles(<q-args>)
 command! -bang -nargs=* Ag                        call fzf#vim#ag(<q-args>)
 command! -bang -nargs=* Rg                        call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -- ".shellescape(<q-args>), 1)
-command! -bang -nargs=* Rgu                       call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -g !Tests/* -g !Documentation/* -- ".shellescape(<q-args>), 1)
+command! -bang -nargs=* Rgu                       call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -g '!Tests/*' -g '!Documentation/*' -- ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
 command! -bar -bang -nargs=? -complete=buffer Buffers  call fzf#vim#buffers(<q-args>)
 nnoremap <silent> <Leader>f :call fzf#vim#files('', fzf#vim#with_preview({'options': '--prompt ""'}, 'right:70%')) <CR>
 
