@@ -32,6 +32,9 @@ Plug 'https://github.com/majutsushi/tagbar'
 Plug 'https://github.com/scrooloose/nerdtree'
 Plug 'https://github.com/junegunn/fzf'
 Plug 'https://github.com/junegunn/fzf.vim'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
 
 Plug 'https://github.com/vim-airline/vim-airline'
 Plug 'https://github.com/vim-airline/vim-airline-themes'
@@ -45,6 +48,49 @@ Plug 'https://github.com/drewtempelmeyer/palenight.vim'
 call plug#end()
 
 filetype plugin indent on
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+" LSP
+""""""""""""""""""""""""""""""""""""""""""""""""
+if executable('pyls')
+    " pip install python-language-server
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'pyls',
+        \ 'cmd': {server_info->['pyls']},
+        \ 'allowlist': ['python'],
+        \ })
+endif
+
+if executable('clangd')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'clangd',
+        \ 'cmd': {server_info->['clangd', '-background-index']},
+        \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp'],
+        \ })
+endif
+
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=yes
+    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> gt <plug>(lsp-type-definition)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> [g <Plug>(lsp-previous-diagnostic)
+    nmap <buffer> ]g <Plug>(lsp-next-diagnostic)
+    nmap <buffer> K <plug>(lsp-hover)
+    
+    " refer to doc to add more commands
+endfunction
+
+augroup lsp_install
+    au!
+    " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 " vim-easymotion
@@ -182,7 +228,7 @@ nnoremap <Leader>f :Lines<CR>
 command! -bang -nargs=? GFiles call fzf#vim#gitfiles(<q-args>)
 command! -bang -nargs=* Ag                        call fzf#vim#ag(<q-args>)
 command! -bang -nargs=* Rg                        call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -- ".shellescape(<q-args>), 1)
-command! -bang -nargs=* Rgu                       call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -g '!Tests/*' -g '!Documentation/*' -- ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
+command! -bang -nargs=* Rgu                       call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -t cpp -t cs -g '!Tests/*' -g '!Documentation/*' -- ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
 command! -bar -bang -nargs=? -complete=buffer Buffers  call fzf#vim#buffers(<q-args>)
 nnoremap <silent> <Leader>f :call fzf#vim#files('', fzf#vim#with_preview({'options': '--prompt ""'}, 'right:70%')) <CR>
 
