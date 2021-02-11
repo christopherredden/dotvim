@@ -35,6 +35,11 @@ Plug 'https://github.com/junegunn/fzf.vim'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'https://github.com/mcchrish/nnn.vim'
+
+Plug 'https://github.com/beeender/Comrade'
+
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
 Plug 'https://github.com/vim-airline/vim-airline'
 Plug 'https://github.com/vim-airline/vim-airline-themes'
@@ -48,6 +53,11 @@ Plug 'https://github.com/drewtempelmeyer/palenight.vim'
 call plug#end()
 
 filetype plugin indent on
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+" NNN
+""""""""""""""""""""""""""""""""""""""""""""""""
+let g:nnn#layout = { 'window': { 'width': 0.9, 'height': 0.6, 'highlight': 'Debug' } }
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 " LSP
@@ -90,6 +100,20 @@ augroup lsp_install
     " call s:on_lsp_buffer_enabled only for languages that has the server registered.
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
+""""""""""""""""""""""""""""""""""""""""""""""""
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+" nvim-treesitter
+""""""""""""""""""""""""""""""""""""""""""""""""
+lua <<EOF
+  require'nvim-treesitter.configs'.setup {
+    ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+    highlight = {
+      enable = true,              -- false will disable the whole extension
+      --disable = { "c", "rust" },  -- list of language that will be disabled
+    },
+  }
+EOF
 """"""""""""""""""""""""""""""""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""""""""""""
