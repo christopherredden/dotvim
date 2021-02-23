@@ -8,6 +8,8 @@ if has('win32')
     source $VIMRUNTIME/mswin.vim
 endif
 
+set mouse=a
+
 " Modify Middle Mouse
 "map <C-MiddleMouse> "*p
 vmap <C-MiddleMouse> "*y
@@ -191,7 +193,8 @@ endif
 let $FZF_DEFAULT_OPTS='--color=dark --layout=reverse --margin 1,4'
 
 " Using the custom window creation function
-let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+"let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+let g:fzf_layout = { 'down': '~40%' }
 
 " Customize fzf colors to match your color scheme
 " 'info':    ['fg', 'PreProc'],
@@ -239,22 +242,33 @@ function! FloatingFZF()
     call nvim_open_win(buf, v:true, opts)
 endfunction
 
+function! s:build_location_list(lines) abort
+    call setloclist(0, map(copy(a:lines), '{ "filename": v:val }'))
+    lopen
+endfunction
+
+function! s:build_quickfix_list(lines)
+    call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+    copen
+    cc
+endfunction
+
 let g:fzf_action = {
+  \ 'ctrl-q': function('s:build_quickfix_list'),
+  \ 'ctrl-l': function('s:build_location_list'),
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
 
-nnoremap <Leader>a :Ag<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>g :GFiles<CR>
 nnoremap <Leader>f :Lines<CR>
 
-command! -bang -nargs=? GFiles call fzf#vim#gitfiles(<q-args>)
-command! -bang -nargs=* Ag                        call fzf#vim#ag(<q-args>)
-command! -bang -nargs=* Rg                        call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -- ".shellescape(<q-args>), 1)
-command! -bang -nargs=* Rgu                       call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -t cpp -t cs -g '!Tests/*' -g '!Documentation/*' -- ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
-command! -bar -bang -nargs=? -complete=buffer Buffers  call fzf#vim#buffers(<q-args>)
-nnoremap <silent> <Leader>f :call fzf#vim#files('', fzf#vim#with_preview({'options': '--prompt ""'}, 'right:70%')) <CR>
+"command! -bang -nargs=? GFiles call fzf#vim#gitfiles(<q-args>)
+"command! -bang -nargs=* Rg                        call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -- ".shellescape(<q-args>), 1)
+"command! -bang -nargs=* Rgu                       call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -t cpp -t cs -g '!Tests/*' -g '!Documentation/*' -- ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
+"command! -bar -bang -nargs=? -complete=buffer Buffers  call fzf#vim#buffers(<q-args>)
+"nnoremap <silent> <Leader>f :call fzf#vim#files('', fzf#vim#with_preview({'options': '--prompt ""'}, 'right:70%')) <CR>
 
 "Airline
 let g:airline#extensions#tabline#enabled = 1
@@ -263,3 +277,4 @@ let g:airline_theme='monokai'
 
 " Tags settings
 "set tags=.tags;
+"
