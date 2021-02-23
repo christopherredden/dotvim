@@ -2,13 +2,12 @@ set ff=unix
 
 let mapleader = "\<Space>"
 
-" Copy+Paste Support
-if has('win32')
-    set mouse=a
-    source $VIMRUNTIME/mswin.vim
+if (has('nvim'))
+      let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
 endif
 
 set mouse=a
+set clipboard+=unnamedplus
 
 " Modify Middle Mouse
 "map <C-MiddleMouse> "*p
@@ -45,13 +44,9 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend upda
 
 Plug 'https://github.com/vim-airline/vim-airline'
 Plug 'https://github.com/vim-airline/vim-airline-themes'
-Plug 'https://github.com/rcabralc/monokai-airline.vim'
 
-Plug 'https://github.com/icymind/NeoSolarized'
-Plug 'https://github.com/crusoexia/vim-monokai'
-Plug 'https://github.com/altercation/vim-colors-solarized'
-Plug 'https://github.com/ayu-theme/ayu-vim'
-Plug 'https://github.com/drewtempelmeyer/palenight.vim'
+" Colour theme
+Plug 'https://github.com/kaicataldo/material.vim'
 call plug#end()
 
 filetype plugin indent on
@@ -135,10 +130,12 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 """"""""""""""""""""""""""""""""""""""""""""""""
 
 " Color and Font Setup
-colorscheme palenight
+"let g:material_theme_style = 'default' | 'palenight' | 'ocean' | 'lighter' | 'darker' | 'default-community' | 'palenight-community' | 'ocean-community' | 'lighter-community' | 'darker-community'
+let g:material_terminal_italics = 0
+let g:material_theme_style = 'palenight'
+colorscheme material
 set termguicolors     " enable true colors support
 set background=dark
-"colorscheme one
 set guifont="Noto Mono:h10"
 
 " Smart Formatting
@@ -190,57 +187,11 @@ endif
 " FZF
 """""""""""""""""""""""""""""""""""""""""""""""""
 " Reverse the layout to make the FZF list top-down
-let $FZF_DEFAULT_OPTS='--color=dark --layout=reverse --margin 1,4'
+let $BAT_THEME='Material-Theme-Palenight'
+let $FZF_DEFAULT_OPTS="--bind ctrl-a:select-all,ctrl-d:deselect-all --ansi --layout=reverse --preview 'batcat --color=always --style=header,grid --line-range :300 {}'"
 
 " Using the custom window creation function
-"let g:fzf_layout = { 'window': 'call FloatingFZF()' }
-let g:fzf_layout = { 'down': '~40%' }
-
-" Customize fzf colors to match your color scheme
-" 'info':    ['fg', 'PreProc'],
-" 'prompt':  ['fg', 'Conditional'],
-" \ 'header':  ['fg', 'Comment'] }
-" \ 'bg':      ['bg', 'Normal'],
-let g:fzf_colors =
-	\ { 'fg':      ['fg', 'Normal'],
-	\ 'bg':      ['bg', -1],
-	\ 'hl':      ['fg', 'Comment'],
-	\ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-	\ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-	\ 'hl+':     ['fg', 'Statement'],
-	\ 'info':    ['fg', 0],
-	\ 'border':  ['fg', 'Ignore'],
-	\ 'prompt':  ['fg', 0],
-	\ 'pointer': ['fg', 'Exception'],
-	\ 'marker':  ['fg', 'Keyword'],
-	\ 'spinner': ['fg', 'Label'],
-	\ 'header':  ['fg', -1] }
-
-" Function to create the custom floating window
-function! FloatingFZF()
-    " creates a scratch, unlisted, new, empty, unnamed buffer
-    " to be used in the floating window
-    let buf = nvim_create_buf(v:false, v:true)
-    call setbufvar(buf, '&signcolumn', 'no')
-    " 90% of the height
-    let height = float2nr(&lines * 0.9)
-    " 60% of the width
-    let width = float2nr(&columns * 0.8)
-    " horizontal position (centralized)
-    let horizontal = float2nr((&columns - width) / 2)
-    " vertical position (one line down of the top)
-    let vertical = 1
-    let opts = {
-        \ 'relative': 'editor',
-        \ 'row': vertical,
-        \ 'col': horizontal,
-        \ 'width': width,
-        \ 'height': height,
-        \ 'style': 'minimal'
-        \ }
-    " open the new window, floating, and enter to it
-    call nvim_open_win(buf, v:true, opts)
-endfunction
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.9, 'style': 'minimal' } }
 
 function! s:build_location_list(lines) abort
     call setloclist(0, map(copy(a:lines), '{ "filename": v:val }'))
@@ -272,9 +223,5 @@ nnoremap <Leader>f :Lines<CR>
 
 "Airline
 let g:airline#extensions#tabline#enabled = 1
-let g:airline_theme='monokai'
+let g:airline_theme='material'
 "let g:airline_powerline_fonts=1
-
-" Tags settings
-"set tags=.tags;
-"
