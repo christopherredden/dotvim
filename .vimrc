@@ -46,7 +46,8 @@ Plug 'https://github.com/vim-airline/vim-airline'
 Plug 'https://github.com/vim-airline/vim-airline-themes'
 
 " Colour theme
-Plug 'https://github.com/kaicataldo/material.vim'
+"Plug 'https://github.com/kaicataldo/material.vim'
+Plug 'hzchirs/vim-material'
 call plug#end()
 
 filetype plugin indent on
@@ -131,9 +132,13 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 
 " Color and Font Setup
 "let g:material_theme_style = 'default' | 'palenight' | 'ocean' | 'lighter' | 'darker' | 'default-community' | 'palenight-community' | 'ocean-community' | 'lighter-community' | 'darker-community'
-let g:material_terminal_italics = 0
-let g:material_theme_style = 'palenight'
-colorscheme material
+"let g:material_terminal_italics = 0
+"let g:material_theme_style = 'palenight'
+"colorscheme material
+" Palenight
+let g:material_style='palenight'
+colorscheme vim-material
+
 set termguicolors     " enable true colors support
 set background=dark
 set guifont="Noto Mono:h10"
@@ -210,6 +215,23 @@ let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
+
+" Customize fzf colors to match your color scheme
+" - fzf#wrap translates this to a set of `--color` options
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
 
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>g :GFiles<CR>
