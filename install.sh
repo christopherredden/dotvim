@@ -8,7 +8,7 @@ mkdir -p ~/.local/share/nvim/site/autoload
 ln -s $dir/.vimrc ~/.config/nvim/init.vim
 
 echo "Installing vim-plug..."
-wget -O ~/.local/share/nvim/site/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 echo "Installing Plugins..."
 nvim +PlugInstall +qall
