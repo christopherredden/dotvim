@@ -26,6 +26,10 @@ require "paq"
     -- LSP-based Completion plugin
     "hrsh7th/nvim-cmp";
     "hrsh7th/cmp-nvim-lsp";
+
+    -- nvim Tree for directory browsing
+    "nvim-tree/nvim-web-devicons";
+    "nvim-tree/nvim-tree.lua";
 }
 
 -- Enable OneDark colour scheme
@@ -85,6 +89,8 @@ require('lspconfig')['rust_analyzer'].setup
     }
 }
 
+-- Nvim Tree config
+require("nvim-tree").setup()
 
 -- Telescope config
 require("telescope").setup 
