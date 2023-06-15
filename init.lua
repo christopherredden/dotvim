@@ -1,44 +1,64 @@
-require "paq" 
-{
-    -- Let Paq manage itself
-    "savq/paq-nvim";                  
+-- Bootstrap Packer
+local ensure_packer = function()
+  local fn = vim.fn
+  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+  if fn.empty(fn.glob(install_path)) > 0 then
+    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+    vim.cmd [[packadd packer.nvim]]
+    return true
+  end
+  return false
+end
 
-    -- Color scheme
-    "navarasu/onedark.nvim";
+local packer_bootstrap = ensure_packer()
 
-    -- Telescope fuzzy finder
-    "nvim-telescope/telescope.nvim";
-    "nvim-lua/plenary.nvim";
-    "nvim-telescope/telescope-ui-select.nvim";
+require('packer').startup(function(use)
+  use 'wbthomason/packer.nvim'
 
-    -- Configs for NeoVim LSP client
-    "neovim/nvim-lspconfig";
+	-- My plugins here
+	-- Color scheme
+	use 'navarasu/onedark.nvim';
 
-    -- Show LSP status messages
-    "nvim-lua/lsp-status.nvim";
+	-- Telescope fuzzy finder
+	use "nvim-telescope/telescope.nvim";
+	use "nvim-telescope/telescope-fzf-native.nvim";
+	use "nvim-lua/plenary.nvim";
+	--"nvim-telescope/telescope-ui-select.nvim";
 
-    -- Status line in Lua
-    "nvim-lualine/lualine.nvim";
+	-- Configs for NeoVim LSP client
+	use "neovim/nvim-lspconfig";
 
-    -- Notification framework
-    "rcarriga/nvim-notify";
+	-- Show LSP status messages
+	--use "nvim-lua/lsp-status.nvim";
 
-    -- LSP-based Completion plugin
-    "hrsh7th/nvim-cmp";
-    "hrsh7th/cmp-nvim-lsp";
+	-- Status line in Lua
+	use "nvim-lualine/lualine.nvim";
 
-    -- nvim Tree for directory browsing
-    "nvim-tree/nvim-web-devicons";
-    "nvim-tree/nvim-tree.lua";
-}
+	-- Notification framework
+	--use "rcarriga/nvim-notify";
+
+	-- LSP-based Completion plugin
+	--use "hrsh7th/nvim-cmp";
+	--use "hrsh7th/cmp-nvim-lsp";
+
+	-- nvim Tree for directory browsing
+	--"nvim-tree/nvim-web-devicons";
+	--"nvim-tree/nvim-tree.lua";
+
+  -- Automatically set up your configuration after cloning packer.nvim
+  -- Put this at the end after all plugins
+  if packer_bootstrap then
+    require('packer').sync()
+  end
+end)
 
 -- Enable OneDark colour scheme
 require('onedark').load()
 
-vim.lsp.set_log_level("debug")
+--vim.lsp.set_log_level("debug")
 
 -- autocomplete config
-local cmp = require 'cmp'
+--[[local cmp = require 'cmp'
 cmp.setup 
 {
   mapping = 
@@ -54,12 +74,13 @@ cmp.setup
   {
     { name = 'nvim_lsp' },
   }
-}
+}--]]
 
 local lualine = require('lualine')
 lualine.setup{}
 
 -- omnisharp lsp config
+--[[
 require'lspconfig'.omnisharp.setup 
 {
     capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities()),
@@ -87,42 +108,10 @@ require('lspconfig')['rust_analyzer'].setup
     settings = {
       ["rust-analyzer"] = {}
     }
-}
+}--]]
 
 -- Nvim Tree config
-require("nvim-tree").setup()
-
--- Telescope config
-require("telescope").setup 
-{
-  extensions = 
-  {
-    ["ui-select"] = 
-    {
-      require("telescope.themes").get_dropdown 
-      {
-        -- even more opts
-      }
-
-      -- pseudo code / specification for writing custom displays, like the one
-      -- for "codeactions"
-      -- specific_opts = {
-      --   [kind] = {
-      --     make_indexed = function(items) -> indexed_items, width,
-      --     make_displayer = function(widths) -> displayer
-      --     make_display = function(displayer) -> function(e)
-      --     make_ordinal = function(e) -> string
-      --   },
-      --   -- for example to disable the custom builtin "codeactions" display
-      --      do the following
-      --   codeactions = false,
-      -- }
-    }
-  }
-}
--- To get ui-select loaded and working with telescope, you need to call
--- load_extension, somewhere after setup function:
-require("telescope").load_extension("ui-select")
+--require("nvim-tree").setup()
 
 local set = vim.opt
 
