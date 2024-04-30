@@ -34,6 +34,9 @@ require('packer').startup(function(use)
 	-- Status line in Lua
 	use "nvim-lualine/lualine.nvim";
 
+    -- Motion plugin
+    use "ggandor/leap.nvim";
+
 	-- Notification framework
 	--use "rcarriga/nvim-notify";
 
@@ -78,6 +81,9 @@ cmp.setup
 
 local lualine = require('lualine')
 lualine.setup{}
+
+-- Set up Leap
+require('leap').add_default_mappings()
 
 -- omnisharp lsp config
 --[[
