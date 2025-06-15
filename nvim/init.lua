@@ -34,17 +34,37 @@ if vim.fn.has('win32') then
 end
 
 if vim.g.neovide then
-  vim.o.guifont = "Inconsolata Nerd Font Mono:h11"
+    vim.o.guifont = "Inconsolata Nerd Font Mono:h11"
+    vim.g.neovide_scale_factor = 1.0
+    local change_scale_factor = function(delta)
+      vim.g.neovide_scale_factor = vim.g.neovide_scale_factor * delta
+    end
+    vim.keymap.set("n", "<C-=>", function()
+      change_scale_factor(1.25)
+    end)
+    vim.keymap.set("n", "<C-->", function()
+      change_scale_factor(1/1.25)
+    end)
 end
 
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
+    { import = "plugins" },
+
     -- Mini
     { 'echasnovski/mini.nvim', version = '*' },
     { 'echasnovski/mini.icons', version = '*' },
 
-    { 'neovim/nvim-lspconfig', lazy = false },
+    {
+        "neovim/nvim-lspconfig",
+        opts = {
+            servers = {
+                zls = {},
+                omnisharp = {},
+            },
+        },
+    },
 
     -- Session management
     {
@@ -53,6 +73,13 @@ require("lazy").setup({
       opts = {
         -- add any custom options here
       }
+    },
+
+    -- leap
+    { 'ggandor/leap.nvim', lazy = false,
+       config = function()
+        require('leap').set_default_mappings()
+       end,
     },
 
     -- which-key
@@ -272,6 +299,7 @@ require("lazy").setup({
           "vimdoc",
           "xml",
           "yaml",
+          "zig",
         },
         incremental_selection = {
           enable = true,
