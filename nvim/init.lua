@@ -58,8 +58,10 @@ require("lazy").setup({
 
     {
         "neovim/nvim-lspconfig",
+        event = "BufReadPre",
         opts = {
             servers = {
+                clangd = {},
                 zls = {},
                 omnisharp = {},
             },
@@ -277,6 +279,8 @@ require("lazy").setup({
         ensure_installed = {
           "bash",
           "c",
+          "c_sharp",
+          "cpp",
           "diff",
           "html",
           "javascript",
