@@ -1,23 +1,4 @@
--- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
-end
-vim.opt.rtp:prepend(lazypath)
-
 -- Make sure to setup `mapleader` and `maplocalleader` before
--- loading lazy.nvim so that mappings are correct.
--- This is also a good place to setup other settings (vim.opt)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
@@ -28,6 +9,116 @@ settings.softtabstop = 4
 settings.expandtab = true
 settings.smartindent = true
 settings.number = true
+settings.relativenumber = true
+settings.swapfile = false
+settings.undofile = true
+settings.signcolumn = "yes"
+
+vim.pack.add({
+  "https://github.com/echasnovski/mini.nvim",
+  "https://github.com/echasnovski/mini.icons",
+  "https://github.com/neovim/nvim-lspconfig",
+  "https://github.com/folke/persistence.nvim",
+  "https://github.com/folke/which-key.nvim",
+  "https://github.com/folke/tokyonight.nvim",
+  "https://github.com/ibhagwan/fzf-lua",
+  "https://github.com/ggandor/leap.nvim",
+  "https://github.com/stevearc/oil.nvim",
+  "https://github.com/nvim-treesitter/nvim-treesitter",
+  "https://github.com/Saghen/blink.cmp",
+})
+
+require('leap').set_default_mappings()
+
+require('blink.cmp').setup({
+  fuzzy = {
+    implementation = "lua"
+  }
+})
+
+require('fzf-lua').setup({ winopts={fullscreen=true} })
+
+require("oil").setup()
+require("oil").set_columns({ "icon", "size" })
+
+require('lspconfig').lua_ls.setup({
+  settings = {
+    Lua = {
+      runtime = {
+        -- Tell the language server which version of Lua you're using
+        version = 'LuaJIT',
+      },
+      workspace = {
+        -- Make the server aware of Neovim runtime files
+        library = { vim.env.VIMRUNTIME }
+      },
+      diagnostics = {
+        -- Get the language server to recognize the `vim` global
+        globals = { 'vim' }
+      }
+    }
+  }
+})
+
+require('which-key').setup({
+    preset = "helix",
+})
+
+vim.lsp.enable('lua_ls')
+vim.lsp.enable('omnisharp')
+vim.lsp.enable('zls')
+vim.lsp.enable('clangd')
+
+require("nvim-treesitter.configs").setup({
+    highlight = { enable = true },
+    indent = { enable = true },
+    ensure_installed = {
+      "bash",
+      "c",
+      "c_sharp",
+      "cpp",
+      "diff",
+      "html",
+      "javascript",
+      "jsdoc",
+      "json",
+      "jsonc",
+      "lua",
+      "luadoc",
+      "luap",
+      "markdown",
+      "markdown_inline",
+      "printf",
+      "python",
+      "query",
+      "regex",
+      "toml",
+      "tsx",
+      "typescript",
+      "vim",
+      "vimdoc",
+      "xml",
+      "yaml",
+      "zig",
+  },
+})
+
+--vim.keymap.set("n", "<leader>ff", function() Snacks.picker.files() end, { desc = "Find Files" })
+vim.keymap.set("n", "<leader><leader>", "<Cmd>FzfLua global<CR>", { desc = "Global" })
+vim.keymap.set("n", "<leader>ff", "<Cmd>FzfLua files<CR>", { desc = "Find Files" })
+vim.keymap.set("n", "<leader>fgg", "<Cmd>FzfLua grep<CR>", { desc = "Grep" })
+vim.keymap.set("n", "<leader>fgw", "<Cmd>FzfLua grep_cword<CR>", { desc = "Grep Word" })
+vim.keymap.set("n", "<leader>fgl", "<Cmd>FzfLua live_grep<CR>", { desc = "Live Grep" })
+vim.keymap.set("n", "<leader>fb", "<Cmd>FzfLua buffers<CR>", { desc = "Buffers" })
+vim.keymap.set("n", "gd", "<Cmd>FzfLua lsp_definitions<CR>", { desc = "Goto Definition" })
+vim.keymap.set("n", "gD", "<Cmd>FzfLua lsp_declarations<CR>", { desc = "Goto Declaration" })
+vim.keymap.set("n", "gr", "<Cmd>FzfLua lsp_references<CR>", { desc = "Goto References" })
+vim.keymap.set("n", "gI", "<Cmd>FzfLua lsp_implementations<CR>", { desc = "Goto Implementations" })
+vim.keymap.set("n", "gy", "<Cmd>FzfLua lsp_type_definitions<CR>", { desc = "Goto T[y]pe Definition" })
+vim.keymap.set("n", "<leader>fss", "<Cmd>FzfLua lsp_workspace_symbols<CR>", { desc = "LSP Symbols" })
+vim.keymap.set("n", "<leader>fsS", "<Cmd>FzfLua lsp_document_symbols<CR>", { desc = "LSP Document Symbols" })
+
+vim.cmd[[colorscheme tokyonight-moon]]
 
 if vim.fn.has('win32') then
   vim.o.shell = "powershell.exe"
@@ -47,6 +138,9 @@ if vim.g.neovide then
     end)
 end
 
+
+        --{ "<leader>ff", function() Snacks.picker.files() end, desc = "Find Files" },
+--[[
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
@@ -137,7 +231,7 @@ require("lazy").setup({
           function()
             require("which-key").show({ global = false })
           end,
-          desc = "Buffer Keymaps (which-key)",
+         desc = "Buffer Keymaps (which-key)",
         },
         {
           "<c-w><space>",
@@ -335,6 +429,5 @@ require("lazy").setup({
   install = { colorscheme = { "tokyonight-moon" } },
   -- automatically check for plugin updates
   checker = { enabled = true },
-})
+})--]]
 
-vim.cmd[[colorscheme tokyonight-moon]]
