@@ -1,7 +1,6 @@
 -- Make sure to setup `mapleader` and `maplocalleader` before
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
-
 vim.o.winborder = "rounded"
 
 local settings = vim.opt
