@@ -2,6 +2,8 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+vim.o.winborder = "rounded"
+
 local settings = vim.opt
 settings.tabstop = 4
 settings.shiftwidth = 4
@@ -31,9 +33,21 @@ vim.pack.add({
 require('leap').set_default_mappings()
 
 require('blink.cmp').setup({
-  fuzzy = {
-    implementation = "lua"
-  }
+    fuzzy = {
+        implementation = "lua",
+    },
+    signature = {
+        enabled = true,
+    },
+    completion = {
+        list = {
+            max_items = 200,
+            selection = {
+                preselect = true,
+                auto_insert = true,
+            },
+        },
+    },
 })
 
 require('fzf-lua').setup({ winopts={fullscreen=true} })
