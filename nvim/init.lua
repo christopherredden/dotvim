@@ -3,30 +3,33 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 vim.o.winborder = "rounded"
 
-local settings = vim.opt
-settings.tabstop = 4
-settings.shiftwidth = 4
-settings.softtabstop = 4
-settings.expandtab = true
-settings.smartindent = true
-settings.number = true
-settings.relativenumber = true
-settings.swapfile = false
-settings.undofile = true
-settings.signcolumn = "yes"
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
+vim.opt.expandtab = true
+vim.opt.smartindent = true
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.swapfile = false
+vim.opt.undofile = true
+vim.opt.signcolumn = "yes"
+vim.opt.wildmode = "longest:full,full"
 
 vim.pack.add({
-  "https://github.com/echasnovski/mini.nvim",
-  "https://github.com/echasnovski/mini.icons",
-  "https://github.com/neovim/nvim-lspconfig",
-  "https://github.com/folke/persistence.nvim",
-  "https://github.com/folke/which-key.nvim",
-  "https://github.com/folke/tokyonight.nvim",
-  "https://github.com/ibhagwan/fzf-lua",
-  "https://github.com/ggandor/leap.nvim",
-  "https://github.com/stevearc/oil.nvim",
-  "https://github.com/nvim-treesitter/nvim-treesitter",
-  "https://github.com/Saghen/blink.cmp",
+    "https://github.com/echasnovski/mini.nvim",
+    "https://github.com/echasnovski/mini.icons",
+    "https://github.com/neovim/nvim-lspconfig",
+    "https://github.com/folke/persistence.nvim",
+    "https://github.com/folke/which-key.nvim",
+    "https://github.com/folke/tokyonight.nvim",
+    "https://github.com/ibhagwan/fzf-lua",
+    "https://github.com/ggandor/leap.nvim",
+    "https://github.com/stevearc/oil.nvim",
+    "https://github.com/nvim-treesitter/nvim-treesitter",
+    "https://github.com/Saghen/blink.cmp",
+    "https://github.com/mfussenegger/nvim-dap",
+    "https://github.com/rcarriga/nvim-dap-ui",
+    "https://github.com/nvim-neotest/nvim-nio",
 })
 
 require('leap').set_default_mappings()
@@ -116,6 +119,68 @@ require("nvim-treesitter.configs").setup({
   },
 })
 
+local dap = require("dap")
+dap.adapters.gdb = {
+    type = "executable",
+    command = "gdb",
+    args = { "--interpreter=dap", "--eval-command", "set print pretty on" }
+}
+
+dap.configurations.c = {
+    {
+        name = "Launch",
+        type = "gdb",
+        request = "launch",
+        program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = "${workspaceFolder}",
+        stopAtBeginningOfMainSubprogram = false,
+    },
+    {
+        name = "Select and attach to process",
+        type = "gdb",
+        request = "attach",
+        program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        pid = function()
+            local name = vim.fn.input('Executable name (filter): ')
+            return require("dap.utils").pick_process({ filter = name })
+        end,
+        cwd = '${workspaceFolder}'
+    },
+    {
+        name = 'Attach to gdbserver :1234',
+        type = 'gdb',
+        request = 'attach',
+        target = 'localhost:1234',
+        program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = '${workspaceFolder}'
+    },
+}
+dap.configurations.cpp = dap.configurations.c
+dap.configurations.rust = dap.configurations.c
+dap.configurations.zig = dap.configurations.c
+
+require("dapui").setup()
+vim.fn.sign_define("DapBreakpoint", { text = "🐞" })
+
+dap.listeners.before.attach.dapui_config = function()
+	require("dapui").open()
+end
+dap.listeners.before.launch.dapui_config = function()
+	require("dapui").open()
+end
+dap.listeners.before.event_terminated.dapui_config = function()
+	require("dapui").close()
+end
+dap.listeners.before.event_exited.dapui_config = function()
+	require("dapui").close()
+end
+
 --vim.keymap.set("n", "<leader>ff", function() Snacks.picker.files() end, { desc = "Find Files" })
 vim.keymap.set("n", "<leader><leader>", "<Cmd>FzfLua global<CR>", { desc = "Global" })
 vim.keymap.set("n", "<leader>ff", "<Cmd>FzfLua files<CR>", { desc = "Find Files" })
@@ -130,6 +195,16 @@ vim.keymap.set("n", "gI", "<Cmd>FzfLua lsp_implementations<CR>", { desc = "Goto 
 vim.keymap.set("n", "gy", "<Cmd>FzfLua lsp_type_definitions<CR>", { desc = "Goto T[y]pe Definition" })
 vim.keymap.set("n", "<leader>fss", "<Cmd>FzfLua lsp_workspace_symbols<CR>", { desc = "LSP Symbols" })
 vim.keymap.set("n", "<leader>fsS", "<Cmd>FzfLua lsp_document_symbols<CR>", { desc = "LSP Document Symbols" })
+
+-- DAP
+vim.keymap.set("n", "<leader>dt", "<Cmd>DapToggleBreakpoint<CR>", { desc = "Toggle Breakpoint" })
+vim.keymap.set("n", "<leader>db", "<Cmd>lua require('dap').list_breakpoints()<CR>", { desc = "List Breakpoints" })
+vim.keymap.set("n", "<leader>dc", "<Cmd>DapContinue<CR>", { desc = "Debug Continue" })
+vim.keymap.set("n", "<leader>di", "<Cmd>DapStepInto<CR>", { desc = "Step Into" })
+vim.keymap.set("n", "<leader>do", "<Cmd>DapStepOver<CR>", { desc = "Step Over" })
+vim.keymap.set("n", "<leader>du", "<Cmd>DapStepOut<CR>", { desc = "Step Out" })
+vim.keymap.set("n", "<leader>dr", "<Cmd>DapToggleRepl<CR>", { desc = "Toggle Repl" })
+vim.keymap.set("n", "<leader>dq", "<Cmd>DapTerminate<CR>", { desc = "Disconnect" })
 
 vim.cmd[[colorscheme tokyonight-moon]]
 
