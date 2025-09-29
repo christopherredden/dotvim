@@ -45,6 +45,19 @@ require('blink.cmp').setup({
     signature = {
         enabled = true,
     },
+    keymap = {
+        preset = "enter",
+        ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+        ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+    },
+    cmdline = {
+        keymap = {
+            ['<Tab>'] = { 'show', 'accept' },
+            ['<CR>'] = { 'accept_and_enter', 'fallback' },
+        },
+        -- (optionally) automatically show the menu
+        completion = { menu = { auto_show = true } }
+    },
     completion = {
         list = {
             max_items = 200,
