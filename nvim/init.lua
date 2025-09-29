@@ -20,6 +20,7 @@ vim.pack.add({
     "https://github.com/echasnovski/mini.icons",
     "https://github.com/neovim/nvim-lspconfig",
     "https://github.com/folke/persistence.nvim",
+    "https://github.com/folke/snacks.nvim",
     "https://github.com/folke/which-key.nvim",
     "https://github.com/folke/tokyonight.nvim",
     "https://github.com/ibhagwan/fzf-lua",
@@ -30,6 +31,9 @@ vim.pack.add({
     "https://github.com/mfussenegger/nvim-dap",
     "https://github.com/rcarriga/nvim-dap-ui",
     "https://github.com/nvim-neotest/nvim-nio",
+
+    -- Markdown
+    "https://github.com/OXY2DEV/markview.nvim",
 })
 
 require('leap').set_default_mappings()
@@ -78,6 +82,67 @@ require('lspconfig').lua_ls.setup({
 
 require('which-key').setup({
     preset = "helix",
+    spec = {
+        {
+            mode = { "n", "v" },
+            { "<leader>d", group = "debug" },
+            { "<leader>f", group = "file/find" },
+            { "<leader>fg", group = "grep" },
+            { "<leader>fs", group = "symbols" },
+            { "<leader>m", group = "markdown" },
+            --{ "<leader><tab>", group = "tabs" },
+            --{ "<leader>c", group = "code" },
+            --{ "<leader>dp", group = "profiler" },
+            --{ "<leader>f", group = "file/find" },
+            --{ "<leader>g", group = "git" },
+            --{ "<leader>gh", group = "hunks" },
+            --{ "<leader>q", group = "quit/session" },
+            --{ "<leader>s", group = "search" },
+            --{ "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+            --{ "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+            { "[", group = "prev" },
+            { "]", group = "next" },
+            { "g", group = "goto" },
+            { "gs", group = "surround" },
+            { "z", group = "fold" },
+            {
+                "<leader>b",
+                group = "buffer",
+                expand = function()
+                    return require("which-key.extras").expand.buf()
+                end,
+            },
+            {
+                "<leader>w",
+                group = "windows",
+                proxy = "<c-w>",
+                expand = function()
+                    return require("which-key.extras").expand.win()
+                end,
+            },
+            -- better descriptions
+            { "gx", desc = "Open with system app" },
+        },
+    }
+})
+
+require("snacks").setup({
+    dashboard = {
+        enabled = true,
+        sections = {
+            { section = "header" },
+            { section = "keys", gap = 0, padding = 1 },
+            { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+            {
+                icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1,
+                action = function(opts)
+                    --vim.cmd('bdelete')
+                    vim.fn.chdir(opts)
+                    vim.cmd('FzfLua global')
+                end,
+            },
+        },
+    },
 })
 
 vim.lsp.enable('lua_ls')
@@ -196,6 +261,10 @@ vim.keymap.set("n", "gy", "<Cmd>FzfLua lsp_type_definitions<CR>", { desc = "Goto
 vim.keymap.set("n", "<leader>fss", "<Cmd>FzfLua lsp_workspace_symbols<CR>", { desc = "LSP Symbols" })
 vim.keymap.set("n", "<leader>fsS", "<Cmd>FzfLua lsp_document_symbols<CR>", { desc = "LSP Document Symbols" })
 
+-- Markdown
+vim.keymap.set("n", "<leader>mt", "<Cmd>Markview Toggle<CR>", { desc = "Toggle Preview" })
+vim.keymap.set("n", "<leader>ms", "<Cmd>Markview splitToggle<CR>", { desc = "Toggle Split" })
+
 -- DAP
 vim.keymap.set("n", "<leader>dt", "<Cmd>DapToggleBreakpoint<CR>", { desc = "Toggle Breakpoint" })
 vim.keymap.set("n", "<leader>db", "<Cmd>lua require('dap').list_breakpoints()<CR>", { desc = "List Breakpoints" })
@@ -208,9 +277,9 @@ vim.keymap.set("n", "<leader>dq", "<Cmd>DapTerminate<CR>", { desc = "Disconnect"
 
 vim.cmd[[colorscheme tokyonight-moon]]
 
-if vim.fn.has('win32') then
-  vim.o.shell = "powershell.exe"
-end
+--if vim.fn.has('win32') then
+  --vim.o.shell = "powershell.exe"
+--end
 
 if vim.g.neovide then
     vim.o.guifont = "Inconsolata Nerd Font Mono:h11"
