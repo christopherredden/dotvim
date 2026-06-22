@@ -24,7 +24,7 @@ vim.pack.add({
     "https://github.com/folke/which-key.nvim",
     "https://github.com/folke/tokyonight.nvim",
     "https://github.com/ibhagwan/fzf-lua",
-    "https://github.com/ggandor/leap.nvim",
+    "https://codeberg.org/andyg/leap.nvim",
     "https://github.com/stevearc/oil.nvim",
     "https://github.com/nvim-treesitter/nvim-treesitter",
     "https://github.com/Saghen/blink.cmp",
@@ -34,9 +34,14 @@ vim.pack.add({
 
     -- Markdown
     "https://github.com/OXY2DEV/markview.nvim",
+
+    -- C#
+    "https://github.com/seblyng/roslyn.nvim",
 })
 
-require('leap').set_default_mappings()
+-- Leap bindings
+vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
+vim.keymap.set('n',             'S', '<Plug>(leap-from-window)')
 
 require('blink.cmp').setup({
     fuzzy = {
@@ -70,28 +75,10 @@ require('blink.cmp').setup({
 })
 
 require('fzf-lua').setup({ winopts={fullscreen=true} })
+require('fzf-lua').register_ui_select()
 
 require("oil").setup()
 require("oil").set_columns({ "icon", "size" })
-
-require('lspconfig').lua_ls.setup({
-  settings = {
-    Lua = {
-      runtime = {
-        -- Tell the language server which version of Lua you're using
-        version = 'LuaJIT',
-      },
-      workspace = {
-        -- Make the server aware of Neovim runtime files
-        library = { vim.env.VIMRUNTIME }
-      },
-      diagnostics = {
-        -- Get the language server to recognize the `vim` global
-        globals = { 'vim' }
-      }
-    }
-  }
-})
 
 require('which-key').setup({
     preset = "helix",
@@ -158,43 +145,69 @@ require("snacks").setup({
     },
 })
 
+vim.lsp.config('lua_ls', {
+  settings = {
+    Lua = {
+      runtime = {
+        -- Tell the language server which version of Lua you're using
+        version = 'LuaJIT',
+      },
+      workspace = {
+        -- Make the server aware of Neovim runtime files
+        library = { vim.env.VIMRUNTIME }
+      },
+      diagnostics = {
+        -- Get the language server to recognize the `vim` global
+        globals = { 'vim' }
+      }
+    }
+  }
+})
+
+-- C# (roslyn.nvim)
+local roslyn_bin = vim.fn.expand('~/.local/share/roslyn/content/LanguageServer/osx-arm64/Microsoft.CodeAnalysis.LanguageServer')
+require("roslyn").setup({
+    broad_search = true,
+    --filewatching = "off",
+})
+vim.lsp.config("roslyn", {
+    cmd = {
+        roslyn_bin,
+        "--logLevel=Information",
+        "--extensionLogDirectory=" .. vim.fs.joinpath(vim.uv.os_tmpdir(), "roslyn_ls/logs"),
+        "--stdio",
+    },
+    -- Only do cheap upward search on auto-start; use :Roslyn target for broad search.
+    root_dir = function(bufnr, on_dir)
+        local config = require("roslyn.config").get()
+        local saved = config.broad_search
+        config.broad_search = false
+        local root = require("roslyn.sln.utils").root_dir(bufnr)
+        config.broad_search = saved
+        if root ~= nil then
+            on_dir(root)
+        end
+    end,
+})
+
+vim.lsp.config('clangd', {
+ cmd = { 'clangd', '--background-index=true', '--clang-tidy=false', '-j', '16' },
+})
+
 vim.lsp.enable('lua_ls')
-vim.lsp.enable('omnisharp')
 vim.lsp.enable('zls')
 vim.lsp.enable('clangd')
 
-require("nvim-treesitter.configs").setup({
-    highlight = { enable = true },
-    indent = { enable = true },
-    ensure_installed = {
-      "bash",
-      "c",
-      "c_sharp",
-      "cpp",
-      "diff",
-      "html",
-      "javascript",
-      "jsdoc",
-      "json",
-      "jsonc",
-      "lua",
-      "luadoc",
-      "luap",
-      "markdown",
-      "markdown_inline",
-      "printf",
-      "python",
-      "query",
-      "regex",
-      "toml",
-      "tsx",
-      "typescript",
-      "vim",
-      "vimdoc",
-      "xml",
-      "yaml",
-      "zig",
-  },
+local treesitter = require("nvim-treesitter")
+treesitter.setup()
+local treesitter_types = { 'java', 'c', 'c_sharp', 'cpp', 'zig', 'markdown', 'markdown_inline', 'lua', 'vim', 'vimdoc', 'query', 'elixir', 'heex', 'javascript', 'typescript', 'html', 'yaml' }
+treesitter.install(treesitter_types)
+
+vim.api.nvim_create_autocmd('FileType', {
+  callback = function()
+    pcall(vim.treesitter.start)
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end,
 })
 
 local dap = require("dap")

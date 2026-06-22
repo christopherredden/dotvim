@@ -5,7 +5,12 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
       -- Optional: Mason to auto-install servers
-      { "williamboman/mason.nvim", config = true },
+      { "williamboman/mason.nvim", opts = {
+        registries = {
+          "github:mason-org/mason-registry",
+          "github:Crashdummyy/mason-registry",
+        },
+      }},
       { "williamboman/mason-lspconfig.nvim" },
       -- Optional: nvim-cmp capability injection
       "hrsh7th/cmp-nvim-lsp",
