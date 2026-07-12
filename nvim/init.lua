@@ -14,6 +14,13 @@ vim.opt.swapfile = false
 vim.opt.undofile = true
 vim.opt.signcolumn = "yes"
 vim.opt.wildmode = "longest:full,full"
+vim.opt.listchars = {
+    tab = "» ",
+    trail = "·",
+    space = "·",
+    nbsp = "␣",
+}
+vim.g.ts_auto_install = true
 
 vim.pack.add({
     "https://github.com/echasnovski/mini.nvim",
@@ -51,14 +58,15 @@ require('blink.cmp').setup({
         enabled = true,
     },
     keymap = {
-        preset = "enter",
+        preset = "default",
+        ["<CR>"] = { "accept", "fallback" },
         ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
         ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
     },
     cmdline = {
         keymap = {
             ['<Tab>'] = { 'show', 'accept' },
-            ['<CR>'] = { 'accept_and_enter', 'fallback' },
+            ['<CR>'] = { 'fallback' },
         },
         -- (optionally) automatically show the menu
         completion = { menu = { auto_show = true } }
@@ -67,8 +75,8 @@ require('blink.cmp').setup({
         list = {
             max_items = 200,
             selection = {
-                preselect = true,
-                auto_insert = true,
+                preselect = false,
+                auto_insert = false,
             },
         },
     },
@@ -98,7 +106,7 @@ require('which-key').setup({
             --{ "<leader>gh", group = "hunks" },
             --{ "<leader>q", group = "quit/session" },
             --{ "<leader>s", group = "search" },
-            --{ "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+            { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
             --{ "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
             { "[", group = "prev" },
             { "]", group = "next" },
@@ -153,6 +161,7 @@ vim.lsp.config('lua_ls', {
         version = 'LuaJIT',
       },
       workspace = {
+        checkThirdParty = false,
         -- Make the server aware of Neovim runtime files
         library = { vim.env.VIMRUNTIME }
       },
@@ -165,18 +174,12 @@ vim.lsp.config('lua_ls', {
 })
 
 -- C# (roslyn.nvim)
-local roslyn_bin = vim.fn.expand('~/.local/share/roslyn/content/LanguageServer/osx-arm64/Microsoft.CodeAnalysis.LanguageServer')
 require("roslyn").setup({
     broad_search = true,
     --filewatching = "off",
 })
 vim.lsp.config("roslyn", {
-    cmd = {
-        roslyn_bin,
-        "--logLevel=Information",
-        "--extensionLogDirectory=" .. vim.fs.joinpath(vim.uv.os_tmpdir(), "roslyn_ls/logs"),
-        "--stdio",
-    },
+    -- roslyn.nvim discovers roslyn-language-server through Mason or PATH.
     -- Only do cheap upward search on auto-start; use :Roslyn target for broad search.
     root_dir = function(bufnr, on_dir)
         local config = require("roslyn.config").get()
@@ -286,6 +289,9 @@ vim.keymap.set("n", "gI", "<Cmd>FzfLua lsp_implementations<CR>", { desc = "Goto 
 vim.keymap.set("n", "gy", "<Cmd>FzfLua lsp_type_definitions<CR>", { desc = "Goto T[y]pe Definition" })
 vim.keymap.set("n", "<leader>fss", "<Cmd>FzfLua lsp_workspace_symbols<CR>", { desc = "LSP Symbols" })
 vim.keymap.set("n", "<leader>fsS", "<Cmd>FzfLua lsp_document_symbols<CR>", { desc = "LSP Document Symbols" })
+
+-- UI
+vim.keymap.set("n", "<leader>uw", "<Cmd>set list!<CR>", { desc = "Toggle Whitespace" })
 
 -- Markdown
 vim.keymap.set("n", "<leader>mt", "<Cmd>Markview Toggle<CR>", { desc = "Toggle Preview" })
