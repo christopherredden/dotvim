@@ -174,12 +174,18 @@ vim.lsp.config('lua_ls', {
 })
 
 -- C# (roslyn.nvim)
+local roslyn_bin = vim.fn.expand('~/.local/share/roslyn/content/LanguageServer/osx-arm64/Microsoft.CodeAnalysis.LanguageServer')
 require("roslyn").setup({
     broad_search = true,
-    --filewatching = "off",
+    filewatching = "off",
 })
 vim.lsp.config("roslyn", {
-    -- roslyn.nvim discovers roslyn-language-server through Mason or PATH.
+    cmd = {
+        roslyn_bin,
+        "--logLevel=Information",
+        "--extensionLogDirectory=" .. vim.fs.joinpath(vim.uv.os_tmpdir(), "roslyn_ls/logs"),
+        "--stdio",
+    },
     -- Only do cheap upward search on auto-start; use :Roslyn target for broad search.
     root_dir = function(bufnr, on_dir)
         local config = require("roslyn.config").get()
@@ -207,9 +213,15 @@ local treesitter_types = { 'java', 'c', 'c_sharp', 'cpp', 'zig', 'markdown', 'ma
 treesitter.install(treesitter_types)
 
 vim.api.nvim_create_autocmd('FileType', {
-  callback = function()
+  callback = function(args)
     pcall(vim.treesitter.start)
-    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    -- Treesitter indent only for languages with an indents query (c_sharp has
+    -- none; keep the ftplugin's indentexpr there, e.g. cindent for C#).
+    local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+    local ok, query = pcall(vim.treesitter.query.get, lang, 'indents')
+    if ok and query then
+      vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end
   end,
 })
 
