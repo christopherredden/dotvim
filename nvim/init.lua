@@ -96,9 +96,9 @@ require('blink.cmp').setup({
 
 require('fzf-lua').setup({
   winopts = { fullscreen = true },
-  -- Roslyn's first jump into an assembly reads its PDB and checks every source file (~12s for
-  -- Unity engine modules). The default 5s timeout cancels the request, so it never completes.
-  lsp = { async_or_timeout = 30000 },
+  -- Roslyn's first semantic request in a project compiles it (~10s for Unity.Entities). Async
+  -- pickers open immediately and fill in when the server answers instead of blocking the editor.
+  lsp = { async_or_timeout = true },
 })
 require('fzf-lua').register_ui_select()
 
