@@ -94,7 +94,12 @@ require('blink.cmp').setup({
 })
 --]]
 
-require('fzf-lua').setup({ winopts={fullscreen=true} })
+require('fzf-lua').setup({
+  winopts = { fullscreen = true },
+  -- Roslyn's first jump into an assembly reads its PDB and checks every source file (~12s for
+  -- Unity engine modules). The default 5s timeout cancels the request, so it never completes.
+  lsp = { async_or_timeout = 30000 },
+})
 require('fzf-lua').register_ui_select()
 
 require("oil").setup()
@@ -187,28 +192,29 @@ vim.lsp.config('lua_ls', {
 
 -- C# (roslyn.nvim)
 local roslyn_bin = vim.fn.expand('~/.local/share/roslyn/content/LanguageServer/osx-arm64/Microsoft.CodeAnalysis.LanguageServer')
+local roslyn_targets = require("roslyn_targets")
 require("roslyn").setup({
     broad_search = true,
     filewatching = "off",
+    choose_target = roslyn_targets.choose_target,
 })
+roslyn_targets.patch_broad_search()
+roslyn_targets.track_lsp_jumps()
+-- Roslyn loads non-SDK-style .csproj files (Unity-generated) through Mono if it finds `mono` on PATH,
+-- and only falls back to the dotnet build host when Mono is absent. The installed Mono is x86_64-only.
+local roslyn_path = table.concat(vim.tbl_filter(function(dir)
+    return not dir:find("Mono.framework", 1, true)
+end, vim.split(vim.env.PATH or "", ":", { plain = true })), ":")
 vim.lsp.config("roslyn", {
+    cmd_env = { PATH = roslyn_path },
     cmd = {
         roslyn_bin,
         "--logLevel=Information",
         "--extensionLogDirectory=" .. vim.fs.joinpath(vim.uv.os_tmpdir(), "roslyn_ls/logs"),
         "--stdio",
     },
-    -- Only do cheap upward search on auto-start; use :Roslyn target for broad search.
-    root_dir = function(bufnr, on_dir)
-        local config = require("roslyn.config").get()
-        local saved = config.broad_search
-        config.broad_search = false
-        local root = require("roslyn.sln.utils").root_dir(bufnr)
-        config.broad_search = saved
-        if root ~= nil then
-            on_dir(root)
-        end
-    end,
+    -- Starts the solution whose projects compile the opened file; see lua/roslyn_targets.lua.
+    root_dir = roslyn_targets.root_dir,
 })
 
 vim.lsp.config('clangd', {
