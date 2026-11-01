@@ -34,7 +34,7 @@ vim.pack.add({
     "https://codeberg.org/andyg/leap.nvim",
     "https://github.com/stevearc/oil.nvim",
     "https://github.com/nvim-treesitter/nvim-treesitter",
-    "https://github.com/Saghen/blink.cmp",
+    --[["https://github.com/Saghen/blink.cmp",--]]
     "https://github.com/mfussenegger/nvim-dap",
     "https://github.com/rcarriga/nvim-dap-ui",
     "https://github.com/nvim-neotest/nvim-nio",
@@ -50,6 +50,17 @@ vim.pack.add({
 vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
 vim.keymap.set('n',             'S', '<Plug>(leap-from-window)')
 
+-- Native as-you-type LSP completion
+vim.o.autocomplete = true
+vim.opt.complete = { "o" } -- Use 'omnifunc'; LSP sets this automatically
+vim.opt.completeopt = {
+   "menuone",
+   "noselect",
+   "popup",
+   "fuzzy",
+}
+
+--[[
 require('blink.cmp').setup({
     fuzzy = {
         implementation = "lua",
@@ -81,6 +92,7 @@ require('blink.cmp').setup({
         },
     },
 })
+--]]
 
 require('fzf-lua').setup({ winopts={fullscreen=true} })
 require('fzf-lua').register_ui_select()
