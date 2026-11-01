@@ -239,7 +239,12 @@ end
 --- `:Roslyn target` lists solutions through roslyn.nvim's broad search, which walks every
 --- directory in Lua; replace it with the cached rg-based listing.
 function M.patch_broad_search()
-    require("roslyn.sln.utils").find_solutions_broad = function(bufnr)
+    local discovery = require("roslyn.sln.discovery")
+    local find_solutions_for_buffer = discovery.find_solutions_for_buffer
+    discovery.find_solutions_for_buffer = function(bufnr)
+        if not require("roslyn.config").get().broad_search then
+            return find_solutions_for_buffer(bufnr)
+        end
         local root = vim.fs.root(bufnr, ".git") or vim.uv.cwd()
         return M.list_solutions(root)
     end
@@ -275,9 +280,13 @@ function M.root_dir(bufnr, on_dir)
         if not vim.api.nvim_buf_is_valid(bufnr) then
             return
         end
+        local target = require("roslyn.target")
         if sln then
-            chosen[vim.fs.dirname(sln)] = sln
-            on_dir(vim.fs.dirname(sln))
+            local dir = vim.fs.dirname(sln)
+            chosen[dir] = sln
+            -- roslyn.nvim's on_init opens the solution recorded here for the client's root_dir.
+            target.remember({ kind = "solution", root_dir = dir, target = sln })
+            on_dir(dir)
             return
         end
 
@@ -286,10 +295,12 @@ function M.root_dir(bufnr, on_dir)
         local config = require("roslyn.config").get()
         local saved = config.broad_search
         config.broad_search = false
-        local root = require("roslyn.sln.utils").root_dir(bufnr)
+        local decision = target.resolve(bufnr)
         config.broad_search = saved
-        if root then
-            on_dir(root)
+        target.notify_if_needed(decision)
+        target.remember(decision)
+        if decision.root_dir then
+            on_dir(decision.root_dir)
         end
     end)
 end
