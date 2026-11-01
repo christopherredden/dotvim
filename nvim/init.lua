@@ -215,6 +215,11 @@ vim.lsp.config("roslyn", {
     },
     -- Starts the solution whose projects compile the opened file; see lua/roslyn_targets.lua.
     root_dir = roslyn_targets.root_dir,
+    settings = {
+        -- Unity-generated projects have no NuGet packages, so the per-project `dotnet restore`
+        -- Roslyn runs after loading only adds ~0.5s per project.
+        projects = { dotnet_enable_automatic_restore = false },
+    },
 })
 
 vim.lsp.config('clangd', {
